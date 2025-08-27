@@ -46,7 +46,7 @@ public class UserMenuForm extends javax.swing.JFrame {
         });
         
        btnCrearFactura.addActionListener(e -> {
-    // Paso 1: Datos del cliente
+    //  Datos del cliente
     String nombre = JOptionPane.showInputDialog("Nombre del cliente:");
     String correo = JOptionPane.showInputDialog("Correo:");
     String telefono = JOptionPane.showInputDialog("Teléfono:");
@@ -57,7 +57,7 @@ public class UserMenuForm extends javax.swing.JFrame {
     Cliente cliente = new Cliente(id, nombre, correo, telefono, usuario, contrasena);
     CrearFactura factura = new CrearFactura(cliente);
 
-    // Paso 2: Agregar productos
+    //  Agregar productos
     boolean seguir = true;
     while (seguir) {
         String nombreProd = JOptionPane.showInputDialog("Nombre del producto:");
@@ -71,7 +71,7 @@ public class UserMenuForm extends javax.swing.JFrame {
         seguir = (opcion == JOptionPane.YES_OPTION);
     }
 
-    // Paso 3: Mostrar resumen personalizado
+    //  Mostrar resumen personalizado
     StringBuilder resumen = new StringBuilder();
     resumen.append("🧾 Factura generada\n\n");
     resumen.append("ID de Factura: ").append("F").append(System.currentTimeMillis()).append("\n");
@@ -99,7 +99,7 @@ public class UserMenuForm extends javax.swing.JFrame {
 
     JOptionPane.showMessageDialog(null, resumen.toString(), "Resumen de Factura", JOptionPane.INFORMATION_MESSAGE);
 
-    // Paso 4: Exportar PDF
+    //  Exportar PDF
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Guardar factura");
     if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
