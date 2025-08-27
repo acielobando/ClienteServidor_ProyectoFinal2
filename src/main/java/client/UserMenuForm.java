@@ -1,0 +1,247 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package client;
+import helper.JSystem;
+
+import javax.swing.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import modelo.Cliente;
+import modelo.Producto;
+import client.CrearFactura;
+import modelo.ItemFactura;
+public class UserMenuForm extends javax.swing.JFrame {
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(UserMenuForm.class.getName());
+
+
+    private final Socket socket;
+    private final ObjectOutputStream out;
+    private final ObjectInputStream in;
+    private final String nombreUsuario;
+
+    public UserMenuForm(Socket socket, ObjectOutputStream out, ObjectInputStream in, String nombreUsuario) {
+        this.socket = socket;
+        this.out = out;
+        this.in = in;
+        this.nombreUsuario = nombreUsuario;
+        
+        initComponents(); 
+        
+        setTitle("Menú Usuario");
+        setSize(400, 200);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setContentPane(panelPrincipal);
+
+        //btnCrearFactura.addActionListener(e -> {
+            
+      //  });
+
+        btnPerfilUsuario.addActionListener(e -> {
+            new CambiarContrasenaForm(socket, out, in, nombreUsuario).setVisible(true);
+        });
+        
+       btnCrearFactura.addActionListener(e -> {
+    // Paso 1: Datos del cliente
+    String nombre = JOptionPane.showInputDialog("Nombre del cliente:");
+    String correo = JOptionPane.showInputDialog("Correo:");
+    String telefono = JOptionPane.showInputDialog("Teléfono:");
+    String usuario = JOptionPane.showInputDialog("Usuario:");
+    String contrasena = JOptionPane.showInputDialog("Contraseña:");
+    String id = "C" + System.currentTimeMillis(); // ID único
+
+    Cliente cliente = new Cliente(id, nombre, correo, telefono, usuario, contrasena);
+    CrearFactura factura = new CrearFactura(cliente);
+
+    // Paso 2: Agregar productos
+    boolean seguir = true;
+    while (seguir) {
+        String nombreProd = JOptionPane.showInputDialog("Nombre del producto:");
+        double precio = Double.parseDouble(JOptionPane.showInputDialog("Precio:"));
+        int cantidad = Integer.parseInt(JOptionPane.showInputDialog("Cantidad:"));
+
+        Producto producto = new Producto(nombreProd, precio);
+        factura.agregarItem(producto, cantidad);
+
+        int opcion = JOptionPane.showConfirmDialog(null, "¿Agregar otro producto?", "Continuar", JOptionPane.YES_NO_OPTION);
+        seguir = (opcion == JOptionPane.YES_OPTION);
+    }
+
+    // Paso 3: Mostrar resumen personalizado
+    StringBuilder resumen = new StringBuilder();
+    resumen.append("🧾 Factura generada\n\n");
+    resumen.append("ID de Factura: ").append("F").append(System.currentTimeMillis()).append("\n");
+    resumen.append("Fecha: ").append(java.time.LocalDate.now()).append("\n");
+    resumen.append("Usuario creador: ").append(nombreUsuario).append("\n\n");
+
+    resumen.append("Cliente:\n");
+    resumen.append("Nombre: ").append(cliente.getNombre()).append("\n");
+    resumen.append("Correo: ").append(cliente.getCorreo()).append("\n");
+    resumen.append("Teléfono: ").append(cliente.telefono()).append("\n\n");
+
+    resumen.append(" Productos:\n");
+    double total = 0.0;
+    for (ItemFactura item : factura.getItems()) {
+        Producto p = item.getProducto();
+        int cantidad = item.getCantidad();
+        double subtotal = p.getPrecio() * cantidad;
+        resumen.append("- ").append(p.getNombreProducto())
+               .append(" x ").append(cantidad)
+               .append(" = ₡").append(String.format("%.2f", subtotal)).append("\n");
+        total += subtotal;
+    }
+
+    resumen.append("\n Total: ₡").append(String.format("%.2f", total));
+
+    JOptionPane.showMessageDialog(null, resumen.toString(), "Resumen de Factura", JOptionPane.INFORMATION_MESSAGE);
+
+    // Paso 4: Exportar PDF
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Guardar factura");
+    if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        String ruta = fileChooser.getSelectedFile().getAbsolutePath();
+        if (!ruta.toLowerCase().endsWith(".pdf")) ruta += ".pdf";
+        factura.exportarFacturaPDF(ruta);
+    }
+});
+
+
+
+        btnSalir.addActionListener(e -> {
+            if (JSystem.confirmarSalida()) {
+                dispose();
+                new MainForm(socket, out, in, nombreUsuario).setVisible(true);
+            }
+        });
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        panelPrincipal = new javax.swing.JPanel();
+        btnPerfilUsuario = new javax.swing.JButton();
+        btnCrearFactura = new javax.swing.JButton();
+        btnSalir = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        btnPerfilUsuario.setBackground(new java.awt.Color(169, 205, 229));
+        btnPerfilUsuario.setText("Perfil de Usuario");
+        btnPerfilUsuario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPerfilUsuarioActionPerformed(evt);
+            }
+        });
+
+        btnCrearFactura.setBackground(new java.awt.Color(169, 205, 229));
+        btnCrearFactura.setText("Crear Factura");
+        btnCrearFactura.setToolTipText("");
+        btnCrearFactura.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnCrearFacturaMouseClicked(evt);
+            }
+        });
+        btnCrearFactura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCrearFacturaActionPerformed(evt);
+            }
+        });
+
+        btnSalir.setBackground(new java.awt.Color(169, 205, 229));
+        btnSalir.setText("Salir");
+        btnSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalirActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Menú Principal");
+
+        javax.swing.GroupLayout panelPrincipalLayout = new javax.swing.GroupLayout(panelPrincipal);
+        panelPrincipal.setLayout(panelPrincipalLayout);
+        panelPrincipalLayout.setHorizontalGroup(
+            panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPrincipalLayout.createSequentialGroup()
+                .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelPrincipalLayout.createSequentialGroup()
+                        .addGap(161, 161, 161)
+                        .addComponent(btnSalir))
+                    .addGroup(panelPrincipalLayout.createSequentialGroup()
+                        .addGap(131, 131, 131)
+                        .addGroup(panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnPerfilUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+                            .addComponent(btnCrearFactura, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(panelPrincipalLayout.createSequentialGroup()
+                        .addGap(158, 158, 158)
+                        .addComponent(jLabel1)))
+                .addContainerGap(164, Short.MAX_VALUE))
+        );
+        panelPrincipalLayout.setVerticalGroup(
+            panelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPrincipalLayout.createSequentialGroup()
+                .addGap(37, 37, 37)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(btnPerfilUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnCrearFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnSalir)
+                .addContainerGap(52, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panelPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnPerfilUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPerfilUsuarioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnPerfilUsuarioActionPerformed
+
+    private void btnCrearFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearFacturaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCrearFacturaActionPerformed
+
+    private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void btnCrearFacturaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCrearFacturaMouseClicked
+        // fff
+    }//GEN-LAST:event_btnCrearFacturaMouseClicked
+
+    /**
+     * @param args the command line arguments
+     */
+    
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCrearFactura;
+    private javax.swing.JButton btnPerfilUsuario;
+    private javax.swing.JButton btnSalir;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel panelPrincipal;
+    // End of variables declaration//GEN-END:variables
+}
